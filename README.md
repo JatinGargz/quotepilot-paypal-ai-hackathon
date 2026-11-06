@@ -2,6 +2,8 @@
 
 **From a customer message to a seller-approved PayPal invoice.** QuotePilot helps independent sellers turn informal order requests into clear, catalog-priced quotes, then send the invoice through PayPal.
 
+Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/). The official deadline is November 12, 2026 at 12:00 p.m. Pacific Time (November 13 at 1:30 a.m. India Standard Time).
+
 ## What the demo does
 
 1. The seller pastes a customer request and enters the customer’s email.
@@ -73,6 +75,8 @@ The catalog resolves this to two assorted boxes ($36 each) and one vegan box ($4
 - OpenAI Responses API for request understanding
 - PayPal Invoicing REST API for draft creation and email delivery
 - PayPal webhook signature verification for payment status
+
+The default AI model is `gpt-6-luna`; set `OPENAI_MODEL` to another model available to your API account if needed.
 
 ## Prototype limits
 

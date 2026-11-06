@@ -38,20 +38,20 @@ PayPal is the payment and invoicing layer: the approved quote becomes a real san
 
 ## Built with
 
-Node.js, OpenAI Responses API, PayPal Invoicing API, PayPal webhooks, HTML, CSS, and browser JavaScript.
+Node.js, OpenAI Responses API (default model: `gpt-6-luna`, configurable), PayPal Invoicing REST API, verified PayPal invoice webhooks, HTML, CSS, and browser JavaScript. The AI maps natural-language orders to approved catalog SKUs; server-side code calculates prices and totals.
 
 ## Team / links
 
 - Team: [add team members]
 - Demo URL: [add deployed URL]
 - Video: [add demo recording]
-- Repository: [add repository URL]
+- Repository: https://github.com/JatinGargz/quotepilot-paypal-ai-hackathon
 
 ## Submission checklist
 
 - [ ] Join the hackathon on Devpost and confirm entrant eligibility.
 - [ ] Add team members (or confirm solo entry).
-- [ ] Push this source to a public GitHub, GitLab, or Bitbucket repository. Keep the `LICENSE` file visible at the repository root.
+- [x] Push this source to a public GitHub repository. The MIT `LICENSE` file is at the repository root.
 - [ ] Configure AI and PayPal sandbox credentials and capture a working end-to-end demo.
 - [ ] Record and upload a public YouTube demo video under three minutes.
 - [ ] Add the public repository URL, demo URL or complete setup instructions, tools description, and YouTube link to the Devpost project form.
