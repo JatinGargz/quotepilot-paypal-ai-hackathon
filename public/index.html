@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/glow.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -56,6 +57,31 @@
               <div class="eyebrow" id="date-label">YOUR BUSINESS, IN MOTION</div>
               <h1>Good morning, Maya<span class="wave">✳</span></h1>
               <p class="welcome-copy">Here’s what’s happening with your orders today.</p>
+            </div>
+            <div class="hero-glow-figure" aria-hidden="true">
+              <div class="figure-aura"></div>
+              <span class="figure-orbit orbit-one"></span>
+              <span class="figure-orbit orbit-two"></span>
+              <svg viewBox="0 0 180 180" role="presentation">
+                <defs>
+                  <radialGradient id="figure-head" cx="38%" cy="30%" r="75%">
+                    <stop offset="0" stop-color="#f3ffd3" />
+                    <stop offset=".42" stop-color="#bafa73" />
+                    <stop offset="1" stop-color="#64d9b5" />
+                  </radialGradient>
+                  <linearGradient id="figure-body" x1=".2" y1="0" x2=".8" y2="1">
+                    <stop offset="0" stop-color="#e0ff9b" />
+                    <stop offset=".55" stop-color="#8cf0bc" />
+                    <stop offset="1" stop-color="#59cbb9" />
+                  </linearGradient>
+                </defs>
+                <circle class="figure-head" cx="90" cy="49" r="21" fill="url(#figure-head)" />
+                <path class="figure-body" d="M49 143c2-28 16-49 41-49s39 21 41 49l2 10H47l2-10Z" fill="url(#figure-body)" />
+                <path d="M74 106c5 6 10 9 16 9s11-3 16-9" fill="none" stroke="#f1ffd4" stroke-opacity=".76" stroke-width="2" stroke-linecap="round" />
+                <circle cx="90" cy="49" r="29" fill="none" stroke="#d6ff9a" stroke-opacity=".28" stroke-width="1.2" />
+              </svg>
+              <span class="figure-star star-one">✳</span>
+              <span class="figure-star star-two">·</span>
             </div>
             <button class="primary-button" id="focus-request"><span>＋</span> New quote</button>
           </section>
