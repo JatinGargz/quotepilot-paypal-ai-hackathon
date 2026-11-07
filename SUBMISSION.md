@@ -42,17 +42,17 @@ Node.js, Gemini API (`gemini-3.5-flash-lite` free tier), PayPal Invoicing REST A
 
 ## Team / links
 
-- Team: [add team members]
-- Demo URL: [add deployed URL]
-- Video: [add demo recording]
+- Team: Solo entry (confirm this on Devpost)
+- Functional demo: Not hosted; the README has complete local setup and run instructions.
+- Video: Add a public YouTube demo link under three minutes before submitting.
 - Repository: https://github.com/JatinGargz/quotepilot-paypal-ai-hackathon
 
 ## Submission checklist
 
 - [ ] Join the hackathon on Devpost and confirm entrant eligibility.
-- [ ] Add team members (or confirm solo entry).
+- [x] Solo entry.
 - [x] Push this source to a public GitHub repository. The MIT `LICENSE` file is at the repository root.
-- [ ] Configure AI and PayPal sandbox credentials and capture a working end-to-end demo.
+- [ ] Verify AI quote generation and PayPal sandbox invoice flow end to end.
 - [ ] Record and upload a public YouTube demo video under three minutes.
-- [ ] Add the public repository URL, demo URL or complete setup instructions, tools description, and YouTube link to the Devpost project form.
+- [ ] Add the public repository URL, README setup instructions, tools description, and YouTube link to the Devpost project form.
 - [ ] Submit before the deadline above.
