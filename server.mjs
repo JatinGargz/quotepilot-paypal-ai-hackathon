@@ -9,6 +9,7 @@ const PUBLIC = path.join(ROOT, 'public');
 loadEnv(path.join(ROOT, '.env'));
 
 const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || '127.0.0.1';
 const CURRENCY = (process.env.CURRENCY || 'USD').toUpperCase();
 const PAYPAL_ENV = process.env.PAYPAL_ENV === 'live' ? 'live' : 'sandbox';
 const PAYPAL_BASE = PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
@@ -360,7 +361,7 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, HOST, () => {
   console.log(`QuotePilot is running at http://localhost:${PORT}`);
   console.log(`AI: ${hasAI ? 'connected' : 'preview mode'} · PayPal: ${hasPayPal ? PAYPAL_ENV : 'not connected'}`);
 });
