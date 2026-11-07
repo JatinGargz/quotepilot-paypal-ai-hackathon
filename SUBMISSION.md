@@ -38,7 +38,7 @@ PayPal is the payment and invoicing layer: the approved quote becomes a real san
 
 ## Built with
 
-Node.js, OpenAI Responses API (default model: `gpt-6-luna`, configurable), PayPal Invoicing REST API, verified PayPal invoice webhooks, HTML, CSS, and browser JavaScript. The AI maps natural-language orders to approved catalog SKUs; server-side code calculates prices and totals.
+Node.js, Gemini API (`gemini-3.5-flash-lite` free tier), PayPal Invoicing REST API, verified PayPal invoice webhooks, HTML, CSS, and browser JavaScript. The AI maps natural-language orders to approved catalog SKUs; server-side code calculates prices and totals.
 
 ## Team / links
 

@@ -13,7 +13,7 @@ const CURRENCY = (process.env.CURRENCY || 'USD').toUpperCase();
 const PAYPAL_ENV = process.env.PAYPAL_ENV === 'live' ? 'live' : 'sandbox';
 const PAYPAL_BASE = PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 const hasPayPal = Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
-const hasAI = Boolean(process.env.OPENAI_API_KEY);
+const hasAI = Boolean(process.env.GEMINI_API_KEY);
 
 const catalog = [
   { sku: 'classic-box', name: 'Assorted cookie box', description: '12 classic cookies', price: 36 },
@@ -147,46 +147,47 @@ function previewExtract(text) {
 }
 
 async function extractWithAI(requestText) {
-  const response = await fetch('https://api.openai.com/v1/responses', {
+  const instructions = [
+    'You turn a customer message into a draft quote for a small cookie shop.',
+    'Only select SKUs present in the catalog. Do not invent products, prices, quantities, tax, stock, or delivery details.',
+    'Use item quantity as a whole number. When details needed to fulfill an order are absent, put concise questions in questions.',
+    'One vegan box replaces one assorted box when the customer says some of the requested boxes should be vegan.',
+    'Return one JSON object with summary (string), items (array of {sku,quantity,reason}), questions (array of strings), delivery_date (string or null), and budget (number or null).'
+  ].join(' ');
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite')}:generateContent`, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      'x-goog-api-key': process.env.GEMINI_API_KEY,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: process.env.OPENAI_MODEL || 'gpt-6-luna',
-      max_output_tokens: 700,
-      instructions: [
-        'You turn a customer message into a draft quote for a small cookie shop.',
-        'Only select SKUs present in the catalog. Do not invent products, prices, quantities, tax, stock, or delivery details.',
-        'Use item quantity as a whole number. When details needed to fulfill an order are absent, put concise questions in questions.',
-        'One vegan box replaces one assorted box when the customer says some of the requested boxes should be vegan.',
-        'Respond with a single valid JSON object and no markdown. Keys: summary (string), items (array of {sku,quantity,reason}), questions (array of strings), delivery_date (string or null), budget (number or null).'
-      ].join(' '),
-      input: JSON.stringify({
-        customer_request: requestText,
-        catalog: catalog.map(({ sku, name, description, price }) => ({ sku, name, description, price, currency: CURRENCY }))
-      })
+      system_instruction: { parts: [{ text: instructions }] },
+      contents: [{
+        role: 'user',
+        parts: [{ text: JSON.stringify({
+          customer_request: requestText,
+          catalog: catalog.map(({ sku, name, description, price }) => ({ sku, name, description, price, currency: CURRENCY }))
+        }) }]
+      }],
+      generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 700 }
     })
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = payload.error?.message || 'The AI service could not create a quote.';
+    const message = payload.error?.message || 'Gemini could not create a quote. Check the free-tier key and quota.';
     throw new Error(message);
   }
-  const outputText = (payload.output || [])
-    .flatMap((item) => item.content || [])
-    .filter((part) => part.type === 'output_text' || part.type === 'text')
+  const outputText = (payload.candidates?.[0]?.content?.parts || [])
     .map((part) => part.text || '')
     .join('\n')
     .trim();
-  if (!outputText) throw new Error('The AI service returned an empty quote. Please try again.');
+  if (!outputText) throw new Error('Gemini returned an empty quote. Please try again.');
   let parsed;
   try {
     parsed = JSON.parse(outputText);
   } catch {
     const json = outputText.match(/\{[\s\S]*\}/);
-    if (!json) throw new Error('The AI could not format this quote. Please try again.');
+    if (!json) throw new Error('Gemini could not format this quote. Please try again.');
     parsed = JSON.parse(json[0]);
   }
   return parsed;

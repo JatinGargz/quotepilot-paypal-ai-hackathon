@@ -27,16 +27,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Without credentials, QuotePilot runs in **preview mode**. The example request uses a local parser, the invoice button stays unavailable, and no real invoice is sent. This mode is clearly labeled in the UI.
 
-## Connect AI
+## Connect free-tier AI
 
-Add an OpenAI API key and model to `.env`:
+1. Open [Google AI Studio](https://aistudio.google.com/apikey) and create a Gemini API key.
+2. Put the key in `.env`:
 
 ```dotenv
-OPENAI_API_KEY=your_api_key
-OPENAI_MODEL=gpt-6-luna
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-Restart the server. The app uses the OpenAI Responses API from the backend. The key is never sent to the browser.
+3. Keep the project on Google AI Studio's free tier and restart the server. QuotePilot calls Gemini only from its backend; the key is never sent to the browser. Free-tier quotas apply, and Google may use free-tier prompts to improve its products, so use only the sample order data in the demo.
 
 ## Connect PayPal sandbox
 
@@ -72,11 +73,11 @@ The catalog resolves this to two assorted boxes ($36 each) and one vegan box ($4
 ## Stack
 
 - Node.js built-in HTTP server and browser-native HTML/CSS/JavaScript
-- OpenAI Responses API for request understanding
+- Gemini API (`gemini-3.5-flash-lite`, free tier) for request understanding
 - PayPal Invoicing REST API for draft creation and email delivery
 - PayPal webhook signature verification for payment status
 
-The default AI model is `gpt-6-luna`; set `OPENAI_MODEL` to another model available to your API account if needed.
+The default AI model is `gemini-3.5-flash-lite`; set `GEMINI_MODEL` to another free-tier model available to your Google AI Studio project if needed.
 
 ## Prototype limits
 
