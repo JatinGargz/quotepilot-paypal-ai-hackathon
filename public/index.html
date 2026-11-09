@@ -12,32 +12,39 @@
     <link rel="stylesheet" href="/styles.css" />
     <link rel="stylesheet" href="/glow.css" />
   </head>
-  <body>
+  <body data-page="overview">
     <div class="app-shell">
       <aside class="sidebar">
-        <a class="brand" href="#top" aria-label="QuotePilot home">
+        <a class="brand" href="/" aria-label="QuotePilot home">
           <span class="brand-mark"><span></span><span></span><span></span></span>
           <span>quote<span class="brand-light">pilot</span></span>
         </a>
 
         <div class="workspace-label">WORKSPACE</div>
         <nav class="side-nav" aria-label="Main navigation">
-          <a class="nav-item active" href="#workspace"><span class="nav-icon">◫</span> Overview</a>
-          <a class="nav-item" href="#workspace"><span class="nav-icon">▤</span> Quotes <span class="nav-count" id="quote-count">0</span></a>
-          <a class="nav-item" href="#workspace"><span class="nav-icon">♙</span> Customers</a>
-          <a class="nav-item" href="#activity"><span class="nav-icon">⌁</span> Activity</a>
+          <a class="nav-item active" href="/" aria-current="page"><span class="nav-icon">◫</span> Overview</a>
+          <a class="nav-item" href="/quotes.html"><span class="nav-icon">▤</span> Quotes <span class="nav-count" id="quote-count">0</span></a>
+          <a class="nav-item" href="/customers.html"><span class="nav-icon">♙</span> Customers</a>
+          <a class="nav-item" href="/activity.html"><span class="nav-icon">⌁</span> Activity</a>
         </nav>
 
         <div class="sidebar-bottom">
-          <div class="sidebar-help">
+          <a class="sidebar-help" href="/guide.html">
             <div class="help-spark">✳</div>
             <div><strong>Need a hand?</strong><span>See the quick guide</span></div>
             <span class="arrow">↗</span>
-          </div>
+          </a>
           <div class="profile">
-            <div class="avatar">MC</div>
-            <div class="profile-copy"><strong>Maya Chen</strong><span>Little Batch Bakery</span></div>
-            <button class="more-button" aria-label="Profile menu">···</button>
+            <a class="profile-link" href="/profile.html" aria-label="Open Maya Chen's business profile">
+              <div class="avatar">MC</div>
+              <div class="profile-copy"><strong>Maya Chen</strong><span>Little Batch Bakery</span></div>
+            </a>
+            <button class="more-button" id="profile-menu-button" type="button" aria-label="More profile actions" aria-haspopup="menu" aria-expanded="false">···</button>
+            <div class="profile-menu" id="profile-menu" role="menu" hidden>
+              <a href="/profile.html" role="menuitem">Business profile</a>
+              <a href="/guide.html" role="menuitem">Quick guide</a>
+              <button type="button" id="copy-demo-link" role="menuitem">Copy demo link</button>
+            </div>
           </div>
         </div>
       </aside>
@@ -47,7 +54,7 @@
           <div class="breadcrumb">Workspace <span>/</span> Overview</div>
           <div class="topbar-right">
             <div class="connection-pill" id="connection-pill"><span class="connection-dot"></span><span>Connecting</span></div>
-            <button class="icon-button" aria-label="Notifications"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg><i></i></button>
+            <a class="icon-button" href="/activity.html" aria-label="View activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg><i></i></a>
           </div>
         </header>
 
@@ -164,7 +171,7 @@
           </section>
 
           <section class="activity-panel" id="activity">
-            <div class="activity-heading"><div><div class="section-kicker">KEEPING THINGS MOVING</div><h2>Recent activity</h2></div><a href="#activity">View all <span>→</span></a></div>
+            <div class="activity-heading"><div><div class="section-kicker">KEEPING THINGS MOVING</div><h2>Recent activity</h2></div><a href="/activity.html">View all <span>→</span></a></div>
             <div class="activity-list" id="activity-list">
               <div class="activity-row sample-activity"><div class="activity-symbol paid">✓</div><div class="activity-copy"><strong>Invoice paid <span>· #QP-1042</span></strong><span>Ella Morgan paid for a celebration cake</span></div><div class="activity-amount">+$84.00</div><div class="activity-time">2 hours ago</div><span class="activity-more">···</span></div>
               <div class="activity-row sample-activity"><div class="activity-symbol sent">↗</div><div class="activity-copy"><strong>Quote sent <span>· #QP-1041</span></strong><span>Weekend brunch box · Sam Rivera</span></div><div class="activity-amount neutral">$56.00</div><div class="activity-time">Yesterday</div><span class="activity-more">···</span></div>
@@ -178,5 +185,6 @@
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="/app.js" defer></script>
+    <script src="/workspace.js" defer></script>
   </body>
 </html>

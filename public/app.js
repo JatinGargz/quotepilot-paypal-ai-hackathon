@@ -55,6 +55,7 @@ function updateInvoiceButton() {
 }
 
 function drawQuote(quote, aiConfigured) {
+  const isNewQuote = state.quote?.id !== quote.id;
   state.quote = quote;
   quoteEmpty.classList.add('hidden');
   quoteContent.classList.remove('hidden');
@@ -87,7 +88,7 @@ function drawQuote(quote, aiConfigured) {
   const statusText = quote.status === 'PAID' ? 'Paid' : quote.status === 'SENT' ? 'Invoice sent' : quote.questions?.length ? 'Needs review' : 'Draft ready';
   badge.className = `draft-badge ${quote.status === 'PAID' ? 'paid' : quote.status === 'SENT' ? 'sent' : 'draft'}`;
   badge.innerHTML = `<span></span> ${statusText}`;
-  $('#quote-count').textContent = String(Number($('#quote-count').textContent || 0) + 1);
+  if (isNewQuote) $('#quote-count').textContent = String(Number($('#quote-count').textContent || 0) + 1);
   updateInvoiceButton();
 }
 

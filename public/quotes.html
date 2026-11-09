@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b1716" />
+    <meta name="description" content="Review quotes created with QuotePilot." />
+    <title>Quotes — QuotePilot</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/glow.css" />
+    <link rel="stylesheet" href="/workspace-pages.css" />
+  </head>
+  <body data-page="quotes">
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="/" aria-label="QuotePilot home"><span class="brand-mark"><span></span><span></span><span></span></span><span>quote<span class="brand-light">pilot</span></span></a>
+        <div class="workspace-label">WORKSPACE</div>
+        <nav class="side-nav" aria-label="Main navigation">
+          <a class="nav-item" href="/"><span class="nav-icon">◫</span> Overview</a>
+          <a class="nav-item active" href="/quotes.html" aria-current="page"><span class="nav-icon">▤</span> Quotes <span class="nav-count" id="quote-count">0</span></a>
+          <a class="nav-item" href="/customers.html"><span class="nav-icon">♙</span> Customers</a>
+          <a class="nav-item" href="/activity.html"><span class="nav-icon">⌁</span> Activity</a>
+        </nav>
+        <div class="sidebar-bottom">
+          <a class="sidebar-help" href="/guide.html"><div class="help-spark">✳</div><div><strong>Need a hand?</strong><span>See the quick guide</span></div><span class="arrow">↗</span></a>
+          <div class="profile">
+            <a class="profile-link" href="/profile.html" aria-label="Open Maya Chen's business profile"><div class="avatar">MC</div><div class="profile-copy"><strong>Maya Chen</strong><span>Little Batch Bakery</span></div></a>
+            <button class="more-button" id="profile-menu-button" type="button" aria-label="More profile actions" aria-haspopup="menu" aria-expanded="false">···</button>
+            <div class="profile-menu" id="profile-menu" role="menu" hidden><a href="/profile.html" role="menuitem">Business profile</a><a href="/guide.html" role="menuitem">Quick guide</a><button type="button" id="copy-demo-link" role="menuitem">Copy demo link</button></div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-area">
+        <header class="topbar"><div class="breadcrumb">Workspace <span>/</span> Quotes</div><div class="topbar-right"><div class="connection-pill" id="connection-pill"><span class="connection-dot"></span><span>Connecting</span></div><a class="icon-button" href="/activity.html" aria-label="View activity"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM10 21h4"/></svg><i></i></a></div></header>
+        <div class="page-wrap secondary-page">
+          <section class="welcome-row page-intro"><div><div class="eyebrow">YOUR ORDER PIPELINE</div><h1>Quotes<span class="wave">✳</span></h1><p class="welcome-copy">Review every draft and invoice in one place.</p></div><a class="primary-button" href="/"><span>＋</span> New quote</a></section>
+          <section class="metrics page-stats" aria-label="Quote summary">
+            <article class="metric-card"><div class="metric-top"><span>All quotes</span><span class="metric-icon mint">▤</span></div><div class="metric-bottom"><strong id="stat-total">0</strong></div><div class="metric-caption">Created this session</div></article>
+            <article class="metric-card"><div class="metric-top"><span>Drafts</span><span class="metric-icon peach">✳</span></div><div class="metric-bottom"><strong id="stat-drafts">0</strong></div><div class="metric-caption">Ready for your review</div></article>
+            <article class="metric-card metric-highlight"><div class="metric-top"><span>Invoices sent</span><span class="metric-icon dark-icon">↗</span></div><div class="metric-bottom"><strong id="stat-invoices">0</strong></div><div class="metric-caption">PayPal sandbox invoices</div></article>
+          </section>
+          <section class="data-panel"><div class="data-panel-head"><div><div class="section-kicker">QUOTE PIPELINE</div><h2>All quotes</h2></div><span class="data-caption">Quote history lasts for this demo session</span></div><div class="records-list" id="quotes-list"><div class="loading-state">Loading quotes…</div></div></section>
+          <footer class="page-footer"><span>QuotePilot <b>·</b> A little more time for what you love.</span><span><i></i> Catalog prices are always seller-approved</span></footer>
+        </div>
+      </main>
+    </div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="/workspace.js" defer></script>
+  </body>
+</html>
