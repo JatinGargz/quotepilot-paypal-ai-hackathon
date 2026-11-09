@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -11,10 +12,19 @@ loadEnv(path.join(ROOT, '.env'));
 const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '127.0.0.1';
 const CURRENCY = (process.env.CURRENCY || 'USD').toUpperCase();
-const PAYPAL_ENV = process.env.PAYPAL_ENV === 'live' ? 'live' : 'sandbox';
+const DEMO_MODE = process.env.DEMO_MODE === 'true';
+const DEMO_AUTH_USER = process.env.DEMO_AUTH_USER || '';
+const DEMO_AUTH_PASSWORD = process.env.DEMO_AUTH_PASSWORD || '';
+if (DEMO_MODE && (!DEMO_AUTH_USER || !DEMO_AUTH_PASSWORD)) {
+  throw new Error('DEMO_MODE requires DEMO_AUTH_USER and DEMO_AUTH_PASSWORD.');
+}
+const PAYPAL_ENV = !DEMO_MODE && process.env.PAYPAL_ENV === 'live' ? 'live' : 'sandbox';
 const PAYPAL_BASE = PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 const hasPayPal = Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
 const hasAI = Boolean(process.env.GEMINI_API_KEY);
+const DEMO_WINDOW_MS = 60 * 60 * 1000;
+const DEMO_LIMITS = { quotes: 20, invoices: 5 };
+const demoUsage = { quotes: [], invoices: [] };
 
 const catalog = [
   { sku: 'classic-box', name: 'Assorted cookie box', description: '12 classic cookies', price: 36 },
@@ -48,6 +58,45 @@ function requireText(file) {
 function sendJson(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
   res.end(JSON.stringify(data));
+}
+
+function isAuthorized(req) {
+  if (!DEMO_MODE) return true;
+  const header = req.headers.authorization || '';
+  if (!header.startsWith('Basic ')) return false;
+  const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+  const separator = decoded.indexOf(':');
+  if (separator < 0) return false;
+  const username = Buffer.from(decoded.slice(0, separator));
+  const password = Buffer.from(decoded.slice(separator + 1));
+  const expectedUsername = Buffer.from(DEMO_AUTH_USER);
+  const expectedPassword = Buffer.from(DEMO_AUTH_PASSWORD);
+  return username.length === expectedUsername.length
+    && password.length === expectedPassword.length
+    && timingSafeEqual(username, expectedUsername)
+    && timingSafeEqual(password, expectedPassword);
+}
+
+function sendUnauthorized(res) {
+  res.writeHead(401, {
+    'WWW-Authenticate': 'Basic realm="QuotePilot demo", charset="UTF-8"',
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Cache-Control': 'no-store'
+  });
+  res.end('Demo access required.');
+}
+
+function takeDemoQuota(kind) {
+  if (!DEMO_MODE) return true;
+  const now = Date.now();
+  const recent = demoUsage[kind].filter((timestamp) => timestamp > now - DEMO_WINDOW_MS);
+  if (recent.length >= DEMO_LIMITS[kind]) {
+    demoUsage[kind] = recent;
+    return false;
+  }
+  recent.push(now);
+  demoUsage[kind] = recent;
+  return true;
 }
 
 async function readBody(req, limit = 1_000_000) {
@@ -282,6 +331,7 @@ async function handleApi(req, res, url) {
     const customerEmail = typeof body.customerEmail === 'string' ? body.customerEmail.trim() : '';
     if (requestText.length < 8 || requestText.length > 2000) return sendJson(res, 400, { error: 'Describe the order in 8–2,000 characters.' });
     if (customerEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) return sendJson(res, 400, { error: 'Enter a valid customer email address.' });
+    if (!takeDemoQuota('quotes')) return sendJson(res, 429, { error: 'The demo has reached its quote limit for this hour. Please try again later.' });
     try {
       const extract = hasAI ? await extractWithAI(requestText) : previewExtract(requestText);
       const quote = quoteFromExtract(extract, requestText, customerEmail);
@@ -301,8 +351,12 @@ async function handleApi(req, res, url) {
     if (!quote) return sendJson(res, 404, { error: 'Quote expired. Create it again before invoicing.' });
     if (quote.questions.length) return sendJson(res, 409, { error: 'Resolve the quote questions before sending an invoice.' });
     if (!customerEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) return sendJson(res, 400, { error: 'Add a valid customer email before sending the invoice.' });
+    if (DEMO_MODE && !/@(?:personal|business)\.example\.com$/i.test(customerEmail)) {
+      return sendJson(res, 400, { error: 'Demo mode only accepts PayPal sandbox test-account addresses ending in @personal.example.com or @business.example.com.' });
+    }
     quote.customerEmail = customerEmail;
     if (!hasPayPal) return sendJson(res, 503, { error: 'PayPal sandbox is not connected yet. Add your credentials to .env and restart the app.' });
+    if (!takeDemoQuota('invoices')) return sendJson(res, 429, { error: 'The demo has reached its invoice limit for this hour. Please try again later.' });
     try {
       const invoice = await createAndSendInvoice(quote, customerEmail);
       quote.invoiceId = invoice.id;
@@ -344,6 +398,15 @@ async function handleApi(req, res, url) {
 const MIME = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml' };
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  if (req.method === 'GET' && url.pathname === '/healthz') {
+    res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
+    return res.end('ok');
+  }
+  if (DEMO_MODE && !(req.method === 'POST' && url.pathname === '/api/paypal/webhook') && !isAuthorized(req)) {
+    return sendUnauthorized(res);
+  }
   if (url.pathname.startsWith('/api/')) return handleApi(req, res, url);
 
   const relative = url.pathname === '/' ? 'index.html' : decodeURIComponent(url.pathname.slice(1));
