@@ -1,5 +1,4 @@
 import http from 'node:http';
-import { timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -13,11 +12,6 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '127.0.0.1';
 const CURRENCY = (process.env.CURRENCY || 'USD').toUpperCase();
 const DEMO_MODE = process.env.DEMO_MODE === 'true';
-const DEMO_AUTH_USER = process.env.DEMO_AUTH_USER || '';
-const DEMO_AUTH_PASSWORD = process.env.DEMO_AUTH_PASSWORD || '';
-if (DEMO_MODE && (!DEMO_AUTH_USER || !DEMO_AUTH_PASSWORD)) {
-  throw new Error('DEMO_MODE requires DEMO_AUTH_USER and DEMO_AUTH_PASSWORD.');
-}
 const PAYPAL_ENV = !DEMO_MODE && process.env.PAYPAL_ENV === 'live' ? 'live' : 'sandbox';
 const PAYPAL_BASE = PAYPAL_ENV === 'live' ? 'https://api-m.paypal.com' : 'https://api-m.sandbox.paypal.com';
 const hasPayPal = Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
@@ -58,32 +52,6 @@ function requireText(file) {
 function sendJson(res, status, data) {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' });
   res.end(JSON.stringify(data));
-}
-
-function isAuthorized(req) {
-  if (!DEMO_MODE) return true;
-  const header = req.headers.authorization || '';
-  if (!header.startsWith('Basic ')) return false;
-  const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
-  const separator = decoded.indexOf(':');
-  if (separator < 0) return false;
-  const username = Buffer.from(decoded.slice(0, separator));
-  const password = Buffer.from(decoded.slice(separator + 1));
-  const expectedUsername = Buffer.from(DEMO_AUTH_USER);
-  const expectedPassword = Buffer.from(DEMO_AUTH_PASSWORD);
-  return username.length === expectedUsername.length
-    && password.length === expectedPassword.length
-    && timingSafeEqual(username, expectedUsername)
-    && timingSafeEqual(password, expectedPassword);
-}
-
-function sendUnauthorized(res) {
-  res.writeHead(401, {
-    'WWW-Authenticate': 'Basic realm="QuotePilot demo", charset="UTF-8"',
-    'Content-Type': 'text/plain; charset=utf-8',
-    'Cache-Control': 'no-store'
-  });
-  res.end('Demo access required.');
 }
 
 function takeDemoQuota(kind) {
@@ -403,9 +371,6 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'GET' && url.pathname === '/healthz') {
     res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
     return res.end('ok');
-  }
-  if (DEMO_MODE && !(req.method === 'POST' && url.pathname === '/api/paypal/webhook') && !isAuthorized(req)) {
-    return sendUnauthorized(res);
   }
   if (url.pathname.startsWith('/api/')) return handleApi(req, res, url);
 

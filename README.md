@@ -31,7 +31,7 @@ Without credentials, QuotePilot runs in **preview mode**. The example request us
 
 The repository includes a Render Blueprint in `render.yaml`. After pushing it, create a Blueprint in Render from this GitHub repository and choose the Free web-service plan. Render supplies `PORT`; the Blueprint binds the app publicly, keeps PayPal in sandbox, enables a health check, and asks for secrets without putting them in Git.
 
-Set a demo access password, a rotated Gemini API key, and rotated PayPal sandbox client credentials in Render's secret fields. Keep these values out of this repository. The hosted demo requires HTTP Basic authentication, allows only PayPal sandbox test-account email domains for invoices, and limits the service to 20 AI quote requests and 5 sandbox invoices per hour. Give judges the demo username and password only in the hackathon's testing-instructions field.
+Set the Gemini API key and PayPal sandbox client credentials in Render's private environment variables. Keep these values out of this repository. The hosted review demo is publicly accessible to anyone with its URL, stays in PayPal sandbox mode, accepts only PayPal sandbox test-account email domains for invoices, and limits the service to 20 AI quote requests and 5 sandbox invoices per hour. Do not use real customer data or live payment credentials.
 
 Render's Free web services sleep after 15 minutes without traffic, so the first visit after idle time can take about a minute to load. Quote history is held in memory and resets when the service restarts or sleeps. This is a hackathon demo, not a production service.
 
